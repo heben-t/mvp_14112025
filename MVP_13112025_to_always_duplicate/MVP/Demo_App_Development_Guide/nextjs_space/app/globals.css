@@ -1,0 +1,141 @@
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: oklch(0.9824 0.0013 286.3757);
+    --foreground: oklch(0.3211 0 0);
+    --card: oklch(1.0000 0 0);
+    --card-foreground: oklch(0.3211 0 0);
+    --popover: oklch(1.0000 0 0);
+    --popover-foreground: oklch(0.3211 0 0);
+    --primary: oklch(0.6487 0.1538 150.3071);
+    --primary-foreground: oklch(1.0000 0 0);
+    --secondary: oklch(0.6746 0.1414 261.3380);
+    --secondary-foreground: oklch(1.0000 0 0);
+    --muted: oklch(0.8828 0.0285 98.1033);
+    --muted-foreground: oklch(0.5382 0 0);
+    --accent: oklch(0.8269 0.1080 211.9627);
+    --accent-foreground: oklch(0.3211 0 0);
+    --destructive: oklch(0.6368 0.2078 25.3313);
+    --destructive-foreground: oklch(1.0000 0 0);
+    --border: oklch(0.8699 0 0);
+    --input: oklch(0.8699 0 0);
+    --ring: oklch(0.6487 0.1538 150.3071);
+    --chart-1: oklch(0.6487 0.1538 150.3071);
+    --chart-2: oklch(0.6746 0.1414 261.3380);
+    --chart-3: oklch(0.8269 0.1080 211.9627);
+    --chart-4: oklch(0.5880 0.0993 245.7394);
+    --chart-5: oklch(0.5905 0.1608 148.2409);
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: oklch(0.2303 0.0125 264.2926);
+    --foreground: oklch(0.9219 0 0);
+    --card: oklch(0.3210 0.0078 223.6661);
+    --card-foreground: oklch(0.9219 0 0);
+    --popover: oklch(0.3210 0.0078 223.6661);
+    --popover-foreground: oklch(0.9219 0 0);
+    --primary: oklch(0.6487 0.1538 150.3071);
+    --primary-foreground: oklch(1.0000 0 0);
+    --secondary: oklch(0.5880 0.0993 245.7394);
+    --secondary-foreground: oklch(0.9219 0 0);
+    --muted: oklch(0.3867 0 0);
+    --muted-foreground: oklch(0.7155 0 0);
+    --accent: oklch(0.6746 0.1414 261.3380);
+    --accent-foreground: oklch(0.9219 0 0);
+    --destructive: oklch(0.6368 0.2078 25.3313);
+    --destructive-foreground: oklch(1.0000 0 0);
+    --border: oklch(0.3867 0 0);
+    --input: oklch(0.3867 0 0);
+    --ring: oklch(0.6487 0.1538 150.3071);
+    --chart-1: oklch(0.6487 0.1538 150.3071);
+    --chart-2: oklch(0.5880 0.0993 245.7394);
+    --chart-3: oklch(0.6746 0.1414 261.3380);
+    --chart-4: oklch(0.8269 0.1080 211.9627);
+    --chart-5: oklch(0.5905 0.1608 148.2409);
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    @apply bg-background text-foreground;
+  }
+}
+
+/* Grid background pattern for hero section */
+.bg-grid-white\/10 {
+  background-image: linear-gradient(to right, rgba(255, 255, 255, 0.1) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(255, 255, 255, 0.1) 1px, transparent 1px);
+  background-size: 50px 50px;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite linear;
+  background: linear-gradient(
+    to right,
+    transparent 0%,
+    rgba(255, 255, 255, 0.3) 50%,
+    transparent 100%
+  );
+  background-size: 1000px 100%;
+}
+
+@keyframes pulse-glow {
+  0%, 100% {
+    box-shadow: 0 0 20px rgba(100, 181, 255, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(100, 181, 255, 0.6);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Custom scrollbar styles for chatbot */
+.scrollbar-thin::-webkit-scrollbar {
+  width: 6px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #cbd5e0;
+  border-radius: 3px;
+}
+
+.scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #a0aec0;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb {
+  background: #4a5568;
+}
+
+.dark .scrollbar-thin::-webkit-scrollbar-thumb:hover {
+  background: #718096;
+}

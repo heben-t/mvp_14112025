@@ -1,0 +1,28 @@
+access Supabase > startup.metrics table > Consolidated_AI_Impact | AI_Impact_startup_icolumns | Financial_i | Technology_i | Industry_i |  Social_i
+     
+   
+ path: @Demo_App_Development_Guide\ai_roi_dashboard\nextjs_space\.env 
+ You have Supabase credentials in path.
+ 
+ task:Your task is to connect the DB with the frontend and replace the value in <<div class="text-3xl font-bold">0<!-- -->%</div>> in listed pages for startup and investor, with <Consolidated_AI_Impact> dynamically. 
+ 
+ Same task with <AI_Impact_startup_i>, connect the DB with the frontend and replace the value in <<span class="text-7xl font-bold">22%</span>><span class="text-7xl font-bold">22%</span> in listed pages.
+ same task for DB_columns:
+	Financial_i  -  <div class="text-4xl font-bold text-gray-800">N/A</div> && <div class="text-2xl font-bold">0</div>
+	Technology_i - <div class="text-4xl font-bold text-gray-800">High</div> && <div class="text-2xl font-bold">-1</div>
+	Industry_i - <div class="text-4xl font-bold text-gray-800">N/A</div> && <div class="text-2xl font-bold">0</div>
+	Social_i - <div class="text-4xl font-bold text-gray-800">22 views</div> && <div class="text-2xl font-bold">2</div> 
+
+Ensure a perfect sync between frontend and DB.
+ 
+ Constraints:
+ Be mindful of schema.prisma and Supabase alignment. 
+ Ensure these dynamic values are  updated in the listed pages below:
+ /dashbaord (both startup and investor)
+ /roi/[id]
+ /campaigns/[id]
+ /discover with focus on <<p class="text-2xl font-black text-orange-700">22%</p>>
+ Do not round up values. They must be displayed to the nearest hundredth (.00).
+ 
+ Ensure a real-time update. End users must be able to see updated values without refreshing the page.
+ 

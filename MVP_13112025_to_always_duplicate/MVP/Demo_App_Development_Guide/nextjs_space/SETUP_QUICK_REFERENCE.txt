@@ -1,0 +1,164 @@
+┌─────────────────────────────────────────────────────────────────────┐
+│                  🚀 GOOGLE OAUTH - QUICK SETUP                      │
+└─────────────────────────────────────────────────────────────────────┘
+
+═══════════════════════════════════════════════════════════════════════
+ STEP 1: DATABASE SETUP (30 seconds)
+═══════════════════════════════════════════════════════════════════════
+
+  npm run setup:oauth
+
+  ✅ Creates users, startup_profiles, investor_profiles tables
+  ✅ Sets up RLS policies
+  ✅ Creates automatic user creation trigger
+
+═══════════════════════════════════════════════════════════════════════
+ STEP 2: SUPABASE DASHBOARD (2 minutes)
+═══════════════════════════════════════════════════════════════════════
+
+  🌐 URL: https://app.supabase.com/project/gnzcvhyxiatcjofywkdq/auth/providers
+
+  1. Click "Google" provider
+  2. Toggle to ON
+  3. Enter credentials:
+     
+     Client ID:
+     827886733055-tbn7nm5k2j6ktiou29rki9j6rk911ata.apps.googleusercontent.com
+     
+     Client Secret:
+     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
+  
+  4. Click SAVE ← IMPORTANT!
+
+  Also Configure:
+  - Auth → URL Configuration
+  - Site URL: http://localhost:3000
+  - Redirect URLs: http://localhost:3000/auth/callback
+
+═══════════════════════════════════════════════════════════════════════
+ STEP 3: GOOGLE CONSOLE (2 minutes)
+═══════════════════════════════════════════════════════════════════════
+
+  🌐 URL: https://console.cloud.google.com/apis/credentials
+
+  1. Edit OAuth 2.0 Client
+  2. Add to "Authorized redirect URIs":
+     
+     https://gnzcvhyxiatcjofywkdq.supabase.co/auth/v1/callback
+     http://localhost:3000/auth/callback
+  
+  3. Add to "Authorized JavaScript origins":
+     
+     http://localhost:3000
+     https://gnzcvhyxiatcjofywkdq.supabase.co
+  
+  4. Click SAVE ← IMPORTANT!
+
+═══════════════════════════════════════════════════════════════════════
+ STEP 4: VERIFY (30 seconds)
+═══════════════════════════════════════════════════════════════════════
+
+  npm run verify:oauth
+
+  Should show:
+  ✅ Environment variables
+  ✅ Database tables
+  ✅ RLS policies
+
+═══════════════════════════════════════════════════════════════════════
+ STEP 5: TEST (2 minutes)
+═══════════════════════════════════════════════════════════════════════
+
+  npm run dev
+
+  1. Open: http://localhost:3000/auth/signup
+  2. Select role (Startup or Investor)
+  3. Click "Continue with Google"
+  4. Authenticate with Google
+  5. Should redirect back to app ✅
+
+═══════════════════════════════════════════════════════════════════════
+ TROUBLESHOOTING
+═══════════════════════════════════════════════════════════════════════
+
+  ❌ "redirect_uri_mismatch"
+     → Add EXACT redirect URI to Google Console:
+       https://gnzcvhyxiatcjofywkdq.supabase.co/auth/v1/callback
+
+  ❌ "Invalid client"
+     → Re-enter credentials in Supabase Dashboard
+     → Click SAVE
+
+  ❌ User not created
+     → Run: npm run setup:oauth
+     → Check Supabase logs
+
+  ❌ Session not persisting
+     → Use http://localhost:3000 (not 127.0.0.1)
+     → Clear cookies, try incognito
+
+═══════════════════════════════════════════════════════════════════════
+ DOCUMENTATION
+═══════════════════════════════════════════════════════════════════════
+
+  📖 OAUTH_SETUP_README.md         ← Start here (complete guide)
+  📖 QUICK_START_OAUTH.md           ← Quick reference
+  📖 GOOGLE_OAUTH_REBUILD_COMPLETE.md  ← Detailed docs
+  📖 IMPLEMENTATION_SUMMARY.md      ← What was built
+
+═══════════════════════════════════════════════════════════════════════
+ COMMANDS
+═══════════════════════════════════════════════════════════════════════
+
+  npm run setup:oauth    → Run database setup
+  npm run verify:oauth   → Verify configuration
+  npm run dev            → Start development server
+
+═══════════════════════════════════════════════════════════════════════
+ CRITICAL URLS
+═══════════════════════════════════════════════════════════════════════
+
+  Supabase Providers:
+  https://app.supabase.com/project/gnzcvhyxiatcjofywkdq/auth/providers
+
+  Google Console:
+  https://console.cloud.google.com/apis/credentials
+
+  Your Supabase Callback:
+  https://gnzcvhyxiatcjofywkdq.supabase.co/auth/v1/callback
+
+═══════════════════════════════════════════════════════════════════════
+ OAUTH FLOW
+═══════════════════════════════════════════════════════════════════════
+
+  1. Click "Google" → Redirect to Google
+  2. Authenticate → Redirect to Supabase callback
+  3. Supabase creates session → Redirect to your app callback
+  4. Your callback creates user → Redirect to onboarding
+  5. Done! ✅
+
+═══════════════════════════════════════════════════════════════════════
+ SUCCESS CHECKLIST
+═══════════════════════════════════════════════════════════════════════
+
+  □ Database setup complete (npm run setup:oauth)
+  □ Google enabled in Supabase Dashboard
+  □ Credentials saved in Supabase (CLICKED SAVE!)
+  □ Redirect URIs added in Google Console (CLICKED SAVE!)
+  □ Verification passes (npm run verify:oauth)
+  □ Test signup with Google works
+  □ Test signin with Google works
+  □ User created in database with correct role
+  □ Session persists on page refresh
+  □ Redirects to correct page
+
+═══════════════════════════════════════════════════════════════════════
+
+💡 TIP: Most issues are from forgetting to click "Save" in Supabase
+        or Google Console!
+
+🎯 STATUS: Ready for configuration → Takes 5 minutes total
+
+📞 HELP: Check browser console + terminal logs + Supabase auth logs
+
+═══════════════════════════════════════════════════════════════════════

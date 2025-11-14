@@ -1,0 +1,720 @@
+{
+  "name": "Hebed AI - Financial KPIs Complete",
+  "nodes": [
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "field": "cronExpression",
+              "expression": "0 9 * * *"
+            }
+          ]
+        }
+      },
+      "id": "a1daac60-7c40-4539-8206-15bf3070b240",
+      "name": "Schedule: Daily at 9 AM UTC",
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -1056,
+        832
+      ]
+    },
+    {
+      "parameters": {
+        "jsCode": "\n  // n8n Code Node - KPI Calculator\n  // Maps responses from Xero nodes and computes financial KPIs\n\n  // === DATA EXTRACTION ===\n\n  // 1. Xero Payments Data\n  const payments = $(\"Xero - Get payments\").all();\n  const totalRevenue = payments.reduce((sum, payment) => {\n    return sum + (payment.json.Amount || 0);\n  }, 0);\n\n  // 2. Xero Bank Transactions (for expenses and cash balance)\n  const bankTransactions = $(\"Xero - Get Bank Transactions\").all();\n  const cashBalance = bankTransactions\n    .filter(tx => tx.json.Type === \"RECEIVE\")\n    .reduce((sum, tx) => sum + (tx.json.Total || 0), 0) -\n    bankTransactions\n    .filter(tx => tx.json.Type === \"SPEND\")\n    .reduce((sum, tx) => sum + (tx.json.Total || 0), 0);\n\n  const totalExpenses = bankTransactions\n    .filter(tx => tx.json.Type === \"SPEND\")\n    .reduce((sum, tx) => sum + (tx.json.Total || 0), 0);\n\n  // 3. Marketing Expenses\n  const marketingExpenses = $(\"Xero - Get Marketing Expenses\").all();\n  const totalMarketingSpend = marketingExpenses.reduce((sum, claim) => {\n    return sum + (claim.json.Total || 0);\n  }, 0);\n\n  // 4. Churned Customers\n  const churnedCustomers = $(\"Get churned customers\").all();\n  const churnedCount = churnedCustomers.filter(c => c.json.status === \"Canceled\").length;\n  const churnedMRR = churnedCustomers\n    .filter(c => c.json.status === \"Canceled\")\n    .reduce((sum, c) => sum + (c.json.monthly_price || 0), 0);\n\n  // 5. Past MRR Data\n  const mrrHistory = $(\"Get past MRR\").all();\n  const latestMRR = mrrHistory[0]?.json || {};\n  const previousMRR = mrrHistory[1]?.json?.total_mrr || 0;\n  const totalMRR = latestMRR.total_mrr || 0;\n  const activeCustomerCount = latestMRR.active_customers || 0;\n  const newCustomerCount = latestMRR.new_customers || 0;\n\n  // 6. Xero Customers (for subscription counting)\n  const customers = $(\"Xero - Get Customers\").all();\n  const subscriptionCount = customers.filter(c => !c.json.IsCustomer === false).length;\n  const totalCustomers = customers.length;\n\n  // === KPI CALCULATIONS ===\n\n  // Core revenue metrics\n  const ARR = totalMRR * 12;\n  const revenueGrowthRate = previousMRR > 0\n    ? ((totalMRR - previousMRR) / previousMRR) * 100\n    : 0;\n\n  // Cash management\n  const monthlyBurnRate = totalExpenses;\n  const runwayMonths = monthlyBurnRate > 0 ? cashBalance / monthlyBurnRate : 0;\n  const totalCashBalance = cashBalance;\n\n  // Customer economics\n  const CAC = newCustomerCount > 0 ? totalMarketingSpend / newCustomerCount : 0;\n  const avgCustomerValue = activeCustomerCount > 0 ? totalMRR / activeCustomerCount : 0;\n  const customerLifetimeMonths = latestMRR.churn_rate > 0\n    ? 100 / latestMRR.churn_rate\n    : 24; // Default 24 months\n  const LTV = avgCustomerValue * customerLifetimeMonths;\n  const ltvCacRatio = CAC > 0 ? LTV / CAC : 0;\n\n  // Profitability (assuming 20% COGS for SaaS - adjust as needed)\n  const COGS = totalRevenue * 0.20;\n  const grossMarginPercentage = totalRevenue > 0\n    ? ((totalRevenue - COGS) / totalRevenue) * 100\n    : 0;\n\n  // Churn metrics\n  const churnRate = activeCustomerCount > 0\n    ? (churnedCount / activeCustomerCount) * 100\n    : 0;\n\n  // === OUTPUT STRUCTURE ===\n\n  return {\n    json: {\n      metrics: {\n        financial: {\n          // Core revenue metrics\n          mrr: Math.round(totalMRR * 100) / 100,\n          arr: Math.round(ARR * 100) / 100,\n          revenue_growth_rate: Math.round(revenueGrowthRate * 100) / 100,\n\n          // Cash management\n          burn_rate: Math.round(monthlyBurnRate * 100) / 100,\n          runway_months: Math.round(runwayMonths * 10) / 10,\n          cash_balance: Math.round(totalCashBalance * 100) / 100,\n\n          // Customer economics\n          cac: Math.round(CAC * 100) / 100,\n          ltv: Math.round(LTV * 100) / 100,\n          ltv_cac_ratio: Math.round(ltvCacRatio * 100) / 100,\n\n          // Profitability\n          gross_margin_pct: Math.round(grossMarginPercentage * 100) / 100,\n          cogs: Math.round(COGS * 100) / 100,\n\n          // Customer metrics\n          total_customers: activeCustomerCount,\n          active_subscriptions: subscriptionCount,\n          churn_rate: Math.round(churnRate * 100) / 100\n        },\n        metadata: {\n          // Supporting data for validation\n          new_customers_30d: newCustomerCount,\n          churned_customers_30d: churnedCount,\n          marketing_spend_30d: Math.round(totalMarketingSpend * 100) / 100,\n          total_expenses_30d: Math.round(totalExpenses * 100) / 100,\n          avg_customer_value: Math.round(avgCustomerValue * 100) / 100,\n          customer_lifetime_months: Math.round(customerLifetimeMonths * 10) / 10,\n          previous_mrr: Math.round(previousMRR * 100) / 100\n        },\n        data_quality: {\n          // Data completeness indicators\n          has_stripe_data: false, // Not using Stripe in this workflow\n          has_expense_data: bankTransactions.length > 0,\n          has_bank_data: bankTransactions.length > 0,\n          has_crm_data: customers.length > 0,\n          calculation_confidence: (\n            bankTransactions.length > 0 &&\n            customers.length > 0 &&\n            mrrHistory.length > 0\n          ) ? 'high' : 'medium'\n        }\n      }\n    }\n  };"
+      },
+      "id": "69a21c25-79cb-4346-80a6-cf1e751eeb23",
+      "name": "Calculate All Financial KPIs",
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        736,
+        736
+      ]
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 1
+          },
+          "conditions": [
+            {
+              "leftValue": "={{ $json.success }}",
+              "rightValue": 200,
+              "operator": {
+                "type": "boolean",
+                "operation": "true",
+                "singleValue": true
+              },
+              "id": "bf844af9-e757-41e0-85f3-60a8c5049ae9"
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "id": "7d1130e1-76f9-4b6a-ad96-22c2a1ecb114",
+      "name": "Check Response Status",
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2,
+      "position": [
+        1184,
+        736
+      ]
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1Y3IlxUn4oWuWprAQufBOr6_s7QKQbMk179z_uZAgDP0",
+          "mode": "list",
+          "cachedResultName": "Mock_data_MVP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y3IlxUn4oWuWprAQufBOr6_s7QKQbMk179z_uZAgDP0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 150216143,
+          "mode": "list",
+          "cachedResultName": "Log Success",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y3IlxUn4oWuWprAQufBOr6_s7QKQbMk179z_uZAgDP0/edit#gid=150216143"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message": "={{ $json.message }}"
+          },
+          "matchingColumns": [
+            "message"
+          ],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "a12aadd9-3256-49c5-8ff5-c4eac044d8dd",
+      "name": "Log Success to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        1408,
+        640
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "UFb4LrN7D70IPIWO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1Y3IlxUn4oWuWprAQufBOr6_s7QKQbMk179z_uZAgDP0",
+          "mode": "list",
+          "cachedResultName": "Mock_data_MVP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y3IlxUn4oWuWprAQufBOr6_s7QKQbMk179z_uZAgDP0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1203140312,
+          "mode": "list",
+          "cachedResultName": "Log Error",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y3IlxUn4oWuWprAQufBOr6_s7QKQbMk179z_uZAgDP0/edit#gid=1203140312"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "message": "={{ $('Send to DB - Supabase').item.json.message }}"
+          },
+          "matchingColumns": [
+            "message"
+          ],
+          "schema": [
+            {
+              "id": "Date",
+              "displayName": "Date",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "message",
+              "displayName": "message",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "id": "9da3d60d-b88f-47f5-81f1-5bb483e29f2f",
+      "name": "Log Error to Sheet",
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.4,
+      "position": [
+        1408,
+        832
+      ],
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "UFb4LrN7D70IPIWO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.xero.com/api.xro/2.0/Contacts",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer + base64encode(A889A88ECB1748E0B4BD14B437335FBF + \":\" + 5aeTsWTD6vysFGEKHcqLdTDEE0YAS6G_styEF6H_yoZsBDpc)"
+            },
+            {
+              "name": "Content-Type",
+              "value": "x-www-form-urlencoded"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -608,
+        832
+      ],
+      "id": "95cb599a-a8af-4a72-91c6-287e6888c332",
+      "name": "Xero - Get Customers",
+      "credentials": {
+        "xeroOAuth2Api": {
+          "id": "oRmzkQpTGmIZWkJJ",
+          "name": "Xero account"
+        },
+        "oAuth2Api": {
+          "id": "Lw282uW2uyXLWKJC",
+          "name": "oauth-xero"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.xero.com/api.xro/2.0/Payments",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer + base64encode(A889A88ECB1748E0B4BD14B437335FBF + \":\" + 5aeTsWTD6vysFGEKHcqLdTDEE0YAS6G_styEF6H_yoZsBDpc)"
+            },
+            {
+              "name": "Content-Type",
+              "value": "x-www-form-urlencoded"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -832,
+        832
+      ],
+      "id": "33c75fd1-3e89-438c-b4b4-4c27b960c698",
+      "name": "Xero - Get payments",
+      "credentials": {
+        "xeroOAuth2Api": {
+          "id": "oRmzkQpTGmIZWkJJ",
+          "name": "Xero account"
+        },
+        "oAuth2Api": {
+          "id": "Lw282uW2uyXLWKJC",
+          "name": "oauth-xero"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.xero.com/api.xro/2.0/BankTransactions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer + base64encode(A889A88ECB1748E0B4BD14B437335FBF + \":\" + 5aeTsWTD6vysFGEKHcqLdTDEE0YAS6G_styEF6H_yoZsBDpc)"
+            },
+            {
+              "name": "Content-Type",
+              "value": "x-www-form-urlencoded"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -384,
+        832
+      ],
+      "id": "e651bdda-f349-450e-b31b-0ef9737e21b9",
+      "name": "Xero - Get Bank Transactions",
+      "credentials": {
+        "xeroOAuth2Api": {
+          "id": "oRmzkQpTGmIZWkJJ",
+          "name": "Xero account"
+        },
+        "oAuth2Api": {
+          "id": "Lw282uW2uyXLWKJC",
+          "name": "oauth-xero"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "url": "https://api.xero.com/api.xro/2.0/ExpenseClaims",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "oAuth2Api",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "Authorization",
+              "value": "=Bearer + base64encode(A889A88ECB1748E0B4BD14B437335FBF + \":\" + 5aeTsWTD6vysFGEKHcqLdTDEE0YAS6G_styEF6H_yoZsBDpc)"
+            },
+            {
+              "name": "Content-Type",
+              "value": "x-www-form-urlencoded"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        -160,
+        832
+      ],
+      "id": "9ca14e57-f955-4f94-bc2c-c88ccbc2906c",
+      "name": "Xero - Get Marketing Expenses",
+      "credentials": {
+        "xeroOAuth2Api": {
+          "id": "oRmzkQpTGmIZWkJJ",
+          "name": "Xero account"
+        },
+        "oAuth2Api": {
+          "id": "Lw282uW2uyXLWKJC",
+          "name": "oauth-xero"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "##Notes\n\n#Careful\ncheck if available claude KPIs inputs before going further.\n\nadd stripe for canceled subscriptions instead."
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        336,
+        1024
+      ],
+      "id": "1b227901-3c69-43de-9b9d-1b42f4ba6abe",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Y3IlxUn4oWuWprAQufBOr6_s7QKQbMk179z_uZAgDP0",
+          "mode": "list",
+          "cachedResultName": "Mock_data_MVP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y3IlxUn4oWuWprAQufBOr6_s7QKQbMk179z_uZAgDP0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1333050580,
+          "mode": "list",
+          "cachedResultName": "customer_subscriptions",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y3IlxUn4oWuWprAQufBOr6_s7QKQbMk179z_uZAgDP0/edit#gid=1333050580"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "status",
+              "lookupValue": "Canceled"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        64,
+        832
+      ],
+      "id": "f0246f28-b4b7-4f3b-98f8-af12b606ef87",
+      "name": "Get churned customers",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "UFb4LrN7D70IPIWO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1Y3IlxUn4oWuWprAQufBOr6_s7QKQbMk179z_uZAgDP0",
+          "mode": "list",
+          "cachedResultName": "Mock_data_MVP",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y3IlxUn4oWuWprAQufBOr6_s7QKQbMk179z_uZAgDP0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1286238517,
+          "mode": "list",
+          "cachedResultName": "MRR",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1Y3IlxUn4oWuWprAQufBOr6_s7QKQbMk179z_uZAgDP0/edit#gid=1286238517"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        288,
+        832
+      ],
+      "id": "50ad8f4f-de7a-4112-81c6-e19a74ef81f9",
+      "name": "Get past MRR",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "UFb4LrN7D70IPIWO",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "8f37fe84-47ec-426c-8ce2-7e8325608f8f",
+              "leftValue": "={{ $(\"Xero - Get Customers\").all().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "9e84b204-e236-4311-b917-f6e4e3e2b3cc",
+              "leftValue": "={{ $(\"Xero - Get Marketing Expenses\").all().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "61a71356-317d-43aa-938f-556c690a3347",
+              "leftValue": "={{ $(\"Xero - Get Bank Transactions\").all().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "c5c53c63-a5d5-4800-a6ce-6bad60328dfe",
+              "leftValue": "={{ $(\"Get churned customers\").all().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            },
+            {
+              "id": "c816d488-ee80-45dd-a95f-7dd6837aea0e",
+              "leftValue": "={{ $(\"Get past MRR\").all().length }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "gt"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        512,
+        832
+      ],
+      "id": "aee6505a-d54e-4c76-91ed-47ade2186ec4",
+      "name": "If"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Do Nothing",
+      "typeVersion": 1,
+      "position": [
+        736,
+        928
+      ],
+      "id": "d025486a-b1a7-4c7e-bc05-9e8c573d05b9"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "={{$vars.BASE_URL}}/api/v1/metrics/",
+        "sendHeaders": true,
+        "headerParameters": {
+          "parameters": [
+            {
+              "name": "X-API-Key",
+              "value": "41423e7a2ed8fb3420b60d95962ee3b31fea1a735fbea2c75fc3327b0ac9363c"
+            },
+            {
+              "name": "Content-Type",
+              "value": "application/json"
+            },
+            {
+              "name": "X-Hebed-Version",
+              "value": "v1.0.0"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"period\": \"{{$today.year}}-{{$today.month}}\",\n  \"metrics\": {\n    \"financial\": {\n      \"mrr\": {{ $json.metrics.financial.mrr }},\n      \"arr\": {{ $json.metrics.financial.arr }},\n      \"revenue_growth_rate\": {{ $json.metrics.financial.revenue_growth_rate }},\n      \"burn_rate\": {{ $json.metrics.financial.burn_rate }},\n      \"runway_months\": {{ $json.metrics.financial.runway_months }},\n      \"cash_balance\": {{ $json.metrics.financial.cash_balance }},\n      \"cac\": {{ $json.metrics.financial.cac }},\n      \"ltv\": {{ $json.metrics.financial.ltv }},\n      \"ltv_cac_ratio\": {{ $json.metrics.financial.ltv_cac_ratio }},\n      \"gross_margin_pct\": {{ $json.metrics.financial.gross_margin_pct }},\n      \"cogs\": {{ $json.metrics.financial.cogs }},\n      \"total_customers\": {{ $json.metrics.financial.total_customers }},\n      \"active_subscriptions\": {{ $json.metrics.financial.active_subscriptions }},\n      \"churn_rate\": {{ $json.metrics.financial.churn_rate }}\n    },\n    \"metadata\": {\n      \"new_customers_30d\": {{ $json.metrics.metadata.new_customers_30d }},\n      \"churned_customers_30d\": {{ $json.metrics.metadata.churned_customers_30d }},\n      \"marketing_spend_30d\": {{ $json.metrics.metadata.marketing_spend_30d }},\n      \"total_expenses_30d\": {{ $json.metrics.metadata.total_expenses_30d }},\n      \"avg_customer_value\": {{ $json.metrics.metadata.avg_customer_value }},\n      \"customer_lifetime_months\": {{ $json.metrics.metadata.customer_lifetime_months }},\n      \"previous_mrr\": {{ $json.metrics.metadata.previous_mrr }}\n    },\n    \"data_quality\": {\n      \"has_stripe_data\": {{ $json.metrics.data_quality.has_stripe_data }},\n      \"has_expense_data\": {{ $json.metrics.data_quality.has_expense_data }},\n      \"has_bank_data\": {{ $json.metrics.data_quality.has_bank_data }},\n      \"has_crm_data\": {{ $json.metrics.data_quality.has_crm_data }},\n      \"calculation_confidence\": \"{{ $json.metrics.data_quality.calculation_confidence }}\"\n    }\n  },\n  \"timestamp\": \"{{ $now.toISO() }}\"\n}",
+        "options": {
+          "timeout": {}
+        }
+      },
+      "id": "0a79fe17-4b75-4130-8895-fd504c0d7c1b",
+      "name": "Send to DB - Supabase",
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.2,
+      "position": [
+        960,
+        736
+      ]
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Schedule: Daily at 9 AM UTC": {
+      "main": [
+        [
+          {
+            "node": "Xero - Get payments",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Calculate All Financial KPIs": {
+      "main": [
+        [
+          {
+            "node": "Send to DB - Supabase",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Check Response Status": {
+      "main": [
+        [
+          {
+            "node": "Log Success to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Log Error to Sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Xero - Get Customers": {
+      "main": [
+        [
+          {
+            "node": "Xero - Get Bank Transactions",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Xero - Get payments": {
+      "main": [
+        [
+          {
+            "node": "Xero - Get Customers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Xero - Get Marketing Expenses": {
+      "main": [
+        [
+          {
+            "node": "Get churned customers",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Xero - Get Bank Transactions": {
+      "main": [
+        [
+          {
+            "node": "Xero - Get Marketing Expenses",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get churned customers": {
+      "main": [
+        [
+          {
+            "node": "Get past MRR",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get past MRR": {
+      "main": [
+        [
+          {
+            "node": "If",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Calculate All Financial KPIs",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Do Nothing",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Do Nothing": {
+      "main": [
+        []
+      ]
+    },
+    "Send to DB - Supabase": {
+      "main": [
+        [
+          {
+            "node": "Check Response Status",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "2c2ea40f-cf36-41ba-b7e2-8b1ecd0100df",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "90e6540868936ccb41965e9426d27157121af597c1c21c6a9c2b59bc83a496f8"
+  },
+  "id": "Tiw4vuyGsaILFsYa",
+  "tags": []
+}

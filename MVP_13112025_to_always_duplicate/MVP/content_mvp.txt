@@ -1,0 +1,214 @@
+CONTENT TO BE IMPLEMENTED on the following pages. 
+
+
+
+page: /onboarding/startup
+ 
+Startup Onboarding - Form
+Welcome to Hebed AI
+ Let’s set up your startup profile to start connecting with AI-focused investors in the UAE.
+Company Name
+Enter your company name
+Industry
+ Dropdown:
+ ☐ AI SaaS
+ ☐ Fintech / Data Intelligence
+ ☐ PropTech / Real Estate AI
+ ☐ HealthTech
+ ☐ EdTech
+ ☐ AI Infrastructure / Tools
+ ☐ Other AI Applications
+Stage
+ Dropdown (explicit wording):
+ ☐ Pre-Seed (concept or prototype stage, limited traction, preparing for MVP validation)
+ ☐ Seed (MVP ready or early revenue, raising for market expansion and growth)
+Company Description
+ Describe your product, traction, and value proposition in 2-3 sentences.
+Geographic Presence
+ Dropdown:
+ ☐ Based in the UAE
+ ☐ Expanding into the UAE
+ 
+Data migration - Showcase 2 options: 
+☐ Plugin (add-ons)
+☐ manual
+Each option has its own requirement_list.
+
+ Additional guidelines:
+ Action: Onclik event "Submit" button 
+--> Depending on plugin or manual option selected, Add a dynamic msg with 
+requirements to have for the 
+upcoming onboarding meeting.
+
+If plugin:
+Thank you for submitting, our team 
+will schedule an onboarding call. 
+Please make sure to have the requirements 
+below ready before the call:
+[list_requirements]. From your internal software service (excel, stripe, others), List the APIs endpoints to get the metrics below:
+ -Finance 
+	(MRR_now, MRR_prev, ARR = 12 × MRR_now, churn_rate, active_customers), 
+-Technology (THIS will BE ANSWERED MANUALLY).
+		Use of AI: 
+			HR, FINANCE, LAW, COMLIANCE, ALL, OPERATIONS, OTHER department?
+		What does AI improve the most?
+			Speed/Productivity
+			Accuracy
+			Cost Reduction
+			Decision-Making 
+		Do you have an AI/ML model in production or accessible via API? (Yes / No)
+
+-Industy 
+	activeUsers_now 
+	activeUsers_prev
+	engagementRate
+	returningUsers
+
+-Community & Engagement Social media
+	followers_count
+	team_years_experience
+	mentions_count (funded/incubated/featured)
+
+
+if manual:
+Thank you for submitting, our team 
+will schedule an onboarding call. 
+Please make sure to have the requirements 
+below ready before the call:
+list_requirements: The following will be answered on the upcoming call. Please prepare a .csv file containing the following metrics. Click here to download the template.csv
+
+ -Finance 
+	(MRR_now, MRR_prev, ARR = 12 × MRR_now, churn_rate, active_customers), 
+-Technology 
+		Use of AI: 
+			HR, FINANCE, LAW, COMLIANCE, ALL, OPERATIONS, OTHER department?
+		What does AI improve the most?
+			Speed/Productivity
+			Accuracy
+			Cost Reduction
+			Decision-Making 
+		Do you have an AI/ML model in production or accessible via API? (Yes / No)
+
+-Industy 
+	activeUsers_now 
+	activeUsers_prev
+	engagementRate
+	returningUsers
+
+-Community & Engagement Social media
+	followers_count
+	team_years_experience
+	mentions_count (funded/incubated/featured)
+
+
+
+
+
+For both; - In the meantime you can explore the public campaigns.
+--> redirect to coming soon page.
+
+
+
+///////////
+
+page: /onboarding/investor
+Investor Onboarding: - Form
+Step 1
+Investor Profile
+Tell us more about your investment background
+1. Investor Type (liste déroulante)
+ ☐ Individual Investor
+ ☐ Angel Investor
+ ☐ VC Partner
+ ☐ Family Office
+(If you’re just starting to invest in AI startups, select “Individual Investor.”)
+2. Investment Type
+Investment Type (plusieurs réponses possibles)
+ ☐ Equity investment (direct shares)
+ ☐ Convertible Note / SAFE
+ ☐ Crowdfunding participation (via pooled round)
+ ☐ Strategic / Advisory
+ Hebed AI supports both direct and fractional participation in early-stage AI startups.
+Investment Range (Ticket Size) (liste déroulante)
+Select your usual investment range
+ Up to 50,000 dollars
+ 50,000 – 250,000 dollars
+ 250,000 – 1 million dollars
++ 1 million dollars
+Step 2
+Investment Preferences (for Investors)
+This section helps Hebed AI personalize your experience and match you with the most relevant AI startups operating in or expanding to the UAE.
+ Our marketplace focuses exclusively on early-stage AI ventures (pre-seed and seed) seeking to create measurable ROI in the UAE market.
+1. Investment Stage
+Please confirm your preferred investment stage (To be explicit with the terms)
+ ☐ Pre-Seed
+Early-stage startups validating their idea or building their first MVP.
+ ☐ Seed
+Startups with a working MVP, early traction, or first paying users.
+(Hebed AI currently lists AI startups at early-stage maturity with verified ROI potential.)
+2. AI Sector Focus
+Choose the AI verticals that interest you most
+ ☐ AI SaaS
+ ☐ Fintech and Data Intelligence
+ ☐ PropTech and Real Estate AI
+ ☐ HealthTech
+ ☐ EdTech
+ ☐ AI Infrastructure and Tools
+ ☐ Other emerging AI applications Please describe your industry.
+(All startups listed on Hebed AI are AI-driven or AI-integrated ventures.)
+4. Geographic Focus
+Where do you prefer to invest
+ ☐ UAE (Default)
+ ☐ AI startups expanding into the UAE market
+(Hebed AI prioritizes startups headquartered in or entering the UAE ecosystem.)
+5. ROI Priorities
+Which type of ROI matters most to you
+ ☐ Financial ROI (revenue, profitability)
+ ☐ Operational ROI (efficiency, scalability)
+ ☐ Innovation ROI (technology defensibility, product maturity)
+ ☐ Social or Sustainability ROI (impact-driven initiatives)
+(These criteria align with Hebed AI’s multidimensional ROI framework.)
+Your Matches
+ We’ll connect you with AI startups that : 
+1. Fit your stage, sector, and ROI focus
+2. Show strong compatibility scores
+3.  Are UAE-based or expanding into the region
+Step 3
+Control your visibility and understand how investing works on Hebed AI
+1.  Profile Visibility
+☐ Visible to verified AI startups (recommended)
+☐ Visible only after you show interest
+2.  Accreditation (optional)
+☐ I’m an accredited investor
+If selected, our team may contact you later for access to larger or regulated investment rounds once our partnerships are active.
+3. Investment Structure & Risk Notice
+Hebed AI facilitates matching; we don’t hold or manage investor funds
+Early-stage investments are high-risk and returns are not guaranteed
+We focus on verified ROI metrics, transparency, and UAE regulatory alignment.
+///////////
+
+
+page: /dashboard/profile/page.tsx
+remove KYC content/widget in startup profile setup
+For investors: 
+remove accreditation widget.
+
+///////////
+porfolio button must redirect to a "coming soon"page.
+///////////
+page: /discover
+remove  "funding goal field"
+Replace "discover investment oppourtunities" with "Explore verified AI matching opportunities"
+replace value 0 with n/A in widgets exception "Active Campaign" 1st widget from the left.
+
+////////////
+page: investor-dashboard.tsx
+
+add  social widgets (comments + followers) of startup project of interest to investors.
+
+///////////
+
+///////////
+Constraints:
+UI - Design is as similar as the homepage.
+Ensure the UX is seamless

@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(C:/Users/edwar/Downloads/MVP/Demo_App_Development_Guide/ai_roi_dashboard/nextjs_space/setup.bat)",
+      "Bash(./setup.bat)",
+      "Bash(npm run dev:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

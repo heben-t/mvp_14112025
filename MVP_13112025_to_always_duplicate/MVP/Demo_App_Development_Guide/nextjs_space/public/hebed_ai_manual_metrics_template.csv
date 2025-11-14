@@ -1,0 +1,30 @@
+period,MRR_now,MRR_prev,ARR,churn_rate,active_customers,activeUsers_now,activeUsers_prev,engagementRate,returningUsers,followers_count,team_years_experience,mentions_count,ai_use_case,ai_improvement,ai_model_in_production
+2024-01,10000,8000,120000,5,150,500,450,65,300,1200,15,3,FINANCE,Speed/Productivity,Yes
+2024-02,12000,10000,144000,4,180,600,500,68,350,1350,15,4,ALL,Accuracy,Yes
+2024-03,15000,12000,180000,3,220,750,600,70,400,1500,15,5,OPERATIONS,Cost Reduction,Yes
+
+# Instructions for filling this template:
+# 1. period: Format as YYYY-MM (e.g., 2024-01 for January 2024)
+# 2. MRR_now: Monthly Recurring Revenue for current period (in AED or USD)
+# 3. MRR_prev: Monthly Recurring Revenue for previous period
+# 4. ARR: Annual Recurring Revenue = 12 × MRR_now
+# 5. churn_rate: Customer churn rate as percentage (e.g., 5 for 5%)
+# 6. active_customers: Number of paying customers
+# 7. activeUsers_now: Total active users this period
+# 8. activeUsers_prev: Total active users previous period
+# 9. engagementRate: User engagement rate as percentage (e.g., 65 for 65%)
+# 10. returningUsers: Number of returning users
+# 11. followers_count: Social media followers count
+# 12. team_years_experience: Combined years of experience of founding team
+# 13. mentions_count: Number of times mentioned in media/press (funded/incubated/featured)
+# 14. ai_use_case: One of: HR, FINANCE, LAW, COMPLIANCE, ALL, OPERATIONS, OTHER
+# 15. ai_improvement: One of: Speed/Productivity, Accuracy, Cost Reduction, Decision-Making
+# 16. ai_model_in_production: Yes or No
+
+# Notes:
+# - Delete the example rows above before uploading
+# - Add one row for each reporting period
+# - All numeric values should be whole numbers (no currency symbols or commas)
+# - For ai_use_case and ai_improvement, use exact values as shown above
+# - Save this file as CSV (Comma Separated Values) format
+# - Maximum file size: 5MB

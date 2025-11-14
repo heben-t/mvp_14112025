@@ -1,0 +1,146 @@
+Here is a payload response below to transform. 
+
+Raw hypothesis:
+	Bayesian Inference (Uncertainty-aware)
+	A Bayesian approach lets you encode beliefs about each dimension’s contribution — but updates them dynamically as real data comes in.
+	Example:
+		As you observe real outcomes (investment interest, startup growth), your posterior weights update automatically.
+		Outcome: Credibility through adaptive learning — your system improves as you grow.
+		Our ROI model continuously recalibrates itself as verified outcomes accumulate.
+
+Formula:
+Consolidated_AI_Impact = (Financial × a) + (Tech × b) + (Industry × c) + (Social × d) + k // UNSURE WITH THE NAME OF THE outcome
+
+
+Fianancial = Array() // n x 5 dimensions
+Tech = Array() // n x 12 dimensions
+Industry = Array() // n x 4 dimensions
+Social = Array() // n x 3 dimensions
+
+a: weighted average rate of finance; formula:  sum((ARR - operational_costs) * 1/ Investments) / sum(startups)  //1/2*(sum((startups with complete) + (partial Financial available metrics)) / sum(startups)) // divided by 2 because we focus on complete and partial categories.
+b: weighted average rate of Tech (boolean values); formula: 1/12 * (sum(HR + FINANCE + LAW + COMLIANCE + ALL + OPERATIONS + OTHER? + Speed/Productivity + Accuracy + Cost Reduction + Decision-Making + AI model)/ sum(startups))
+c: weighted average rate of Industry;formula: 1/4 * (sum(activeUsers_now + activeUsers_prev	+ engagementRate + returningUsers)/sum(startups))
+d: weighted average rate of Social an arbitrary formula: 1/3*(sum(followers_count + team_years_experience + mentions_count)/sum(startups))
+k: leftovers, volatility; arbitrary value: 5%  //To be optimize with inclusion or exclusion of other components + more data.
+
+
+////////////////////////////////////////
+
+AI_Impact_startup_i - forumula
+
+////////////////////////////////////////
+
+AI_Impact_startup_i = (Financial_i × a) + (Tech_i × b) + (Industry_i × c) + (Social_i × d) + k 
+
+
+Fianancial = Array() // 1 x 5 dimensions
+Tech = Array() // 1 x 12 dimensions
+Industry = Array() // 1 x 4 dimensions
+Social = Array() // 1 x 3 dimensions
+
+a: weighted average rate of finance
+b: weighted average rate of Tech
+c: weighted average rate of Industry
+d: weighted average rate of Social: 
+k: leftovers, volatility; arbitrary value: 5%  //To be optimize with inclusion or exclusion of other components + more data.
+
+[
+  {
+    "body": {
+      "type": "UPDATE",
+      "table": "startup_metrics",
+      "record": {
+        "id": "71c53890-891f-4f80-a5f5-c1a76b3e1a95",
+        "ARR": 19,
+        "MRR_now": 19,
+        "MRR_prev": 13,
+        "churn_rate": 12,
+        "created_at": "2025-11-11T17:18:00.788292+00:00",
+        "updated_at": "2025-11-11T17:18:00.788292+00:00",
+        "Investments": 1000000,
+        "HR (boolean)": true,
+        "ALL (boolean)": false,
+        "LAW (boolean)": false,
+        "engagementRate": null,
+        "mentions_count": null,
+        "activeUsers_now": null,
+        "followers_count": 1,
+        "returningUsers%": 1,
+        "OTHER? (boolean)": false,
+        "activeUsers_prev": null,
+        "active_customers": 1,
+        "FINANCE (boolean)": false,
+        "operational_costs": 200000,
+        "AI model (boolean)": "1",
+        "Accuracy (boolean)": false,
+        "startup_profile_id": "eb4b7820-691b-43fc-b159-6ebf05a6346c",
+        "COMPLIANCE (boolean)": false,
+        "OPERATIONS (boolean)": false,
+        "team_years_experience": 1,
+        "Cost Reduction (boolean)": false,
+        "Decision-Making (boolean)": false,
+        "Speed/Productivity (boolean)": false
+      },
+      "schema": "public",
+      "old_record": {
+        "id": "71c53890-891f-4f80-a5f5-c1a76b3e1a95",
+        "ARR": 19,
+        "MRR_now": 19,
+        "MRR_prev": 13,
+        "churn_rate": 12,
+        "created_at": "2025-11-11T17:18:00.788292+00:00",
+        "updated_at": "2025-11-11T17:18:00.788292+00:00",
+        "Investments": null,
+        "HR (boolean)": true,
+        "ALL (boolean)": false,
+        "LAW (boolean)": false,
+        "engagementRate": null,
+        "mentions_count": null,
+        "activeUsers_now": null,
+        "followers_count": 1,
+        "returningUsers%": 1,
+        "OTHER? (boolean)": false,
+        "activeUsers_prev": null,
+        "active_customers": 1,
+        "FINANCE (boolean)": false,
+        "operational_costs": null,
+        "AI model (boolean)": "1",
+        "Accuracy (boolean)": false,
+        "startup_profile_id": "eb4b7820-691b-43fc-b159-6ebf05a6346c",
+        "COMPLIANCE (boolean)": false,
+        "OPERATIONS (boolean)": false,
+        "team_years_experience": 1,
+        "Cost Reduction (boolean)": false,
+        "Decision-Making (boolean)": false,
+        "Speed/Productivity (boolean)": false
+      }
+    },
+    "webhookUrl": "https://mvphebed.app.n8n.cloud/webhook-test/a0d745c1-5b56-45ba-9710-e6e6892afc10",
+    "executionMode": "test"
+  }
+]
+
+//comments:
+//null = 0
+//false = 0
+//true = 1
+
+Task:  Based on this general context above, you must define a .js script that fits in n8n code node and computs the metrics below.  The script returns a JSON response schema:
+ 
+{
+	"Data": 
+	[
+		{
+			"Consolidated_AI_Impact": <numeric_value>,
+			"AI_Impact_Startup_i":<numeric_value>,
+			"Timestamp":"<date_time>"
+		}
+	]
+}
+
+
+Output: a JSON response
+
+//comments:
+//Important de bien distinguer ROI classic (ce que le marché comprend) et impact IA (la forumule calculée). 
+//Il est impératif de trouver une reformulation/ tournure de phrase pour faire comprendre l'importance de l'impact IA metric avec ROI.
