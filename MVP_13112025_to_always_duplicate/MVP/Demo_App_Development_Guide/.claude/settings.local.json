@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(curl -X POST https://api.perplexity.ai/chat/completions -H \"Authorization: Bearer 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\" -H \"Content-Type: application/json\" -d \"{\"\"model\"\":\"\"llama-3.1-sonar-small-128k-online\"\",\"\"messages\"\":[{\"\"role\"\":\"\"system\"\",\"\"content\"\":\"\"You are a helpful assistant.\"\"},{\"\"role\"\":\"\"user\"\",\"\"content\"\":\"\"What is 2+2?\"\"}],\"\"temperature\"\":0.7,\"\"max_tokens\"\":100}\")",
+      "WebFetch(domain:docs.perplexity.ai)",
+      "Bash(curl -X POST https://api.perplexity.ai/chat/completions -H \"Authorization: Bearer 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\" -H \"Content-Type: application/json\" -d \"{\"\"model\"\":\"\"sonar\"\",\"\"messages\"\":[{\"\"role\"\":\"\"system\"\",\"\"content\"\":\"\"You are a helpful assistant.\"\"},{\"\"role\"\":\"\"user\"\",\"\"content\"\":\"\"What is 2+2?\"\"}],\"\"temperature\"\":0.7,\"\"max_tokens\"\":100}\")",
+      "Read(//c/Users/edwar/Downloads/**)",
+      "Bash(tree:*)",
+      "Bash(find:*)",
+      "Bash(npm run build:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}
