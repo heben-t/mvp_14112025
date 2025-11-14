@@ -1,0 +1,1 @@
+PGPASSWORD=hebedaihebed psql -h aws-1-us-west-1.pooler.supabase.com -U postgres.gnzcvhyxiatcjofywkdq -d postgres -p 5432 -f prisma/migrations/product_design_enhancements.sql
