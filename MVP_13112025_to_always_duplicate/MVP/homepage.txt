@@ -1,0 +1,14 @@
+Pricing page:
+@Demo_App_Development_Guide\ai_roi_dashboard\nextjs_space\app\(marketing)\pricing\page.tsx and all princing pages related. 
+   
+ Edit the design with the following: No more bundle. Only 1 widget with 1 offer, $USD 79 one time. 
+ Widget Features included: 
+	- dashboard metrics
+	- Campaigns 
+	- Profile
+	- Explore other campaigns
+	- Find Investors
+	
+	The call to action widget button redirects to Stripe url: https://buy.stripe.com/test_3cI4gB2QtawY91DcgHasg00
+	
+Once the design completed, add the pricing page as a final step of Startup Onboarding. The end user will make the payment on Stripe and then be redirected to /onboarding/stsartup "Thanks for submitting — we'll schedule your onboarding call"

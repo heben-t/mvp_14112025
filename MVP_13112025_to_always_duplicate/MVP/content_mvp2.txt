@@ -1,0 +1,372 @@
+# Hebed AI — Onboarding & Dashboard Update Spec
+
+## Global Constraints
+
+* UI: match homepage look & feel (type scale, spacing, card shapes, buttons, colors).
+* UX: simple, linear flows with clear progress and success states.
+* Routes referenced below are final.
+* After any successful onboarding submit, show a success state with a secondary CTA: “Explore public campaigns” → redirect to `/coming-soon`.
+
+---
+
+# 1) `/onboarding/startup` — Startup Onboarding
+
+## Page Title
+
+**Startup Onboarding**
+
+## Intro
+
+**Welcome to Hebed AI**
+Let’s set up your startup profile to start connecting with AI-focused investors in the UAE.
+
+## Form (single step)
+
+1. **Company Name** (text)
+
+   * Placeholder: “Enter your company name”
+   * Required: yes (2–80 chars)
+
+2. **Industry** (dropdown; single select)
+
+   * Options:
+
+     * AI SaaS
+     * Fintech / Data Intelligence
+     * PropTech / Real Estate AI
+     * HealthTech
+     * EdTech
+     * AI Infrastructure / Tools
+     * Other AI Applications
+   * Required: yes
+
+3. **Stage** (dropdown; single select; explicit wording)
+
+   * Pre-Seed *(concept or prototype stage, limited traction, preparing for MVP validation)*
+   * Seed *(MVP ready or early revenue, raising for market expansion and growth)*
+   * Required: yes
+
+4. **Company Description** (multiline textarea)
+
+   * Helper: “Describe your product, traction, and value proposition in 2–3 sentences.”
+   * Required: yes (30–400 chars)
+
+5. **Geographic Presence** (dropdown; single select)
+
+   * Based in the UAE
+   * Expanding into the UAE
+   * Required: yes
+
+6. **Data Migration Method** (radio or segmented control; single select; required)
+
+   * **Plugin (add-ons)**
+   * **Manual**
+
+> Each selection drives a different dynamic success message on submit (see “Submission behavior”).
+
+### Validation
+
+* Show inline errors under fields.
+* Disable Submit until required fields are valid.
+
+### Primary Action
+
+**Submit** (onClick)
+
+## Submission behavior (dynamic messaging)
+
+### If **Plugin (add-ons)** selected
+
+**Success headline:** Thanks for submitting — we’ll schedule your onboarding call.
+**Body:** Please make sure to have the requirements below ready before the call:
+**Requirements (list_requirements):**
+
+* From your internal software services (e.g., Excel exports, Stripe, others), list the API endpoints (or data sources) that provide the **Finance** and **Industry** metrics below.
+* **Finance**
+
+  * `MRR_now`, `MRR_prev`, `ARR = 12 × MRR_now`, `churn_rate`, `active_customers`
+* **Technology** *(answered manually on the call)*
+
+  * Use of AI: **HR, FINANCE, LAW, COMPLIANCE, ALL, OPERATIONS, OTHER**
+  * What does AI improve the most? **Speed/Productivity**, **Accuracy**, **Cost Reduction**, **Decision-Making**
+  * AI/ML model in production or accessible via API? **Yes / No**
+* **Industry**
+
+  * `activeUsers_now`, `activeUsers_prev`, `engagementRate`, `returningUsers`
+* **Community & Engagement (Social)**
+
+  * `followers_count`, `team_years_experience`, `mentions_count` *(funded / incubated / featured)*
+
+### If **Manual** selected
+
+**Success headline:** Thanks for submitting — we’ll schedule your onboarding call.
+**Body:** Please prepare a **.csv** file containing the following metrics.
+
+* Download the template: **[hebed_ai_manual_metrics_template.csv](sandbox:/mnt/data/hebed_ai_manual_metrics_template.csv)**
+* **Finance**
+
+  * `MRR_now`, `MRR_prev`, `ARR = 12 × MRR_now`, `churn_rate`, `active_customers`
+* **Technology**
+
+  * Use of AI: **HR, FINANCE, LAW, COMPLIANCE, ALL, OPERATIONS, OTHER**
+  * What does AI improve the most? **Speed/Productivity**, **Accuracy**, **Cost Reduction**, **Decision-Making**
+  * AI/ML model in production or accessible via API? **Yes / No**
+* **Industry**
+
+  * `activeUsers_now`, `activeUsers_prev`, `engagementRate`, `returningUsers`
+* **Community & Engagement (Social)**
+
+  * `followers_count`, `team_years_experience`, `mentions_count` *(funded / incubated / featured)*
+
+**Post-submit CTA (both cases):**
+“In the meantime, you can explore the public campaigns.” → **/coming-soon**
+
+### Submit handler (pseudocode)
+
+```ts
+onSubmit = async (payload) => {
+  const res = await api.onboarding.startup.create(payload);
+  if (res.ok) {
+    if (payload.dataMigrationMethod === 'plugin') showSuccess(pluginMessage);
+    else showSuccess(manualMessageWithCsvLink);
+    router.push('/onboarding/startup/success'); // or show inline success
+  } else showErrors(res.errors);
+}
+```
+
+---
+
+# 2) `/onboarding/investor` — Investor Onboarding (3 steps)
+
+## Step 1 — Investor Profile
+
+**Tell us more about your investment background**
+
+1. **Investor Type** (dropdown)
+
+   * Individual Investor
+   * Angel Investor
+   * VC Partner
+   * Family Office
+     *(If you’re just starting to invest in AI startups, select “Individual Investor.”)*
+
+2. **Investment Type** (checkboxes, multi-select)
+
+   * Equity investment (direct shares)
+   * Convertible Note / SAFE
+   * Crowdfunding participation (via pooled round)
+   * Strategic / Advisory
+     *Note: Hebed AI supports both direct and fractional participation in early-stage AI startups.*
+
+3. **Investment Range (Ticket Size)** (dropdown)
+
+   * Up to **$50,000**
+   * **$50,000 – $250,000**
+   * **$250,000 – $1,000,000**
+   * **$1,000,000+**
+
+**Next**
+
+## Step 2 — Investment Preferences
+
+*This helps personalize your experience and match you with the most relevant AI startups operating in or expanding to the UAE. Our marketplace focuses exclusively on early-stage AI ventures (pre-seed and seed).*
+
+1. **Investment Stage** (checkboxes; multi-select allowed)
+
+   * **Pre-Seed** — Early-stage startups validating their idea or building their first MVP.
+   * **Seed** — Startups with a working MVP, early traction, or first paying users.
+     *(Hebed AI currently lists AI startups at early-stage maturity with verified ROI potential.)*
+
+2. **AI Sector Focus** (checkboxes; multi-select)
+
+   * AI SaaS
+   * Fintech and Data Intelligence
+   * PropTech and Real Estate AI
+   * HealthTech
+   * EdTech
+   * AI Infrastructure and Tools
+   * Other emerging AI applications *(show text input when selected)*
+
+3. **Geographic Focus** (checkboxes; multi-select)
+
+   * UAE *(default pre-checked)*
+   * AI startups expanding into the UAE market
+     *(We prioritize startups headquartered in or entering the UAE ecosystem.)*
+
+4. **ROI Priorities** (checkboxes; multi-select)
+
+   * Financial ROI (revenue, profitability)
+   * Operational ROI (efficiency, scalability)
+   * Innovation ROI (technology defensibility, product maturity)
+   * Social or Sustainability ROI (impact-driven initiatives)
+     *(Aligned with Hebed AI’s multidimensional ROI framework.)*
+
+**Next**
+
+## Step 3 — Visibility & Notices
+
+1. **Profile Visibility** (radio)
+
+   * Visible to verified AI startups *(recommended)*
+   * Visible only after you show interest
+
+2. **Accreditation (optional)** (checkbox)
+
+   * I’m an accredited investor
+     *If selected, our team may contact you later for access to larger or regulated investment rounds once our partnerships are active.*
+
+3. **Investment Structure & Risk Notice** (non-interactive info)
+
+   * Hebed AI facilitates matching; we don’t hold or manage investor funds.
+   * Early-stage investments are high-risk and returns are not guaranteed.
+   * We focus on verified ROI metrics, transparency, and UAE regulatory alignment.
+
+**Submit**
+
+**Submission:** show confirmation and CTA to `/coming-soon` (public campaigns preview).
+
+---
+
+# 3) `/dashboard/profile/page.tsx` — Profile Page Updates
+
+* **Startup profile setup:** remove any **KYC** content/widget.
+* **Investor view:** remove **Accreditation widget** from profile page (it remains in onboarding Step 3 as optional disclosure).
+
+Acceptance:
+
+* No KYC card or prompts render for startups.
+* No Accreditation card renders for investors on this page.
+
+---
+
+# 4) Portfolio Button
+
+* Any “Portfolio” button/link must redirect to **`/coming-soon`**.
+
+---
+
+# 5) `/discover` updates
+
+* Remove **“funding goal”** field entirely.
+* Replace page hero text:
+
+  * From: “discover investment oppourtunities” *(typo)*
+  * To: **“Explore verified AI matching opportunities”**
+* In widgets: replace a displayed value **0 → n/A** for all widgets **except** the **first widget from the left (“Active Campaign”)** which may still show **0**.
+
+Display logic:
+
+```ts
+const formatMetric = (value, {allowZero=false}) => {
+  if (value === 0 && !allowZero) return 'n/A';
+  return String(value);
+}
+// use formatMetric(metric, { allowZero: widget.key === 'activeCampaign' })
+```
+
+---
+
+# 6) `investor-dashboard.tsx`
+
+* Add **social widgets** to startup project detail panels/cards that investors follow or have marked as “interested in.”
+
+  * **Comments** (count + latest 1–2, link to full thread)
+  * **Followers** (count; avatar group of last 5)
+* Placement: right rail on desktop; collapsible section below details on mobile.
+* Empty states:
+
+  * Comments: “No comments yet.”
+  * Followers: “No followers yet.”
+
+---
+
+# Data Model (minimal)
+
+```ts
+// Startup onboarding
+type StartupOnboarding = {
+  companyName: string;
+  industry: 'AI SaaS' | 'Fintech / Data Intelligence' | 'PropTech / Real Estate AI' | 'HealthTech' | 'EdTech' | 'AI Infrastructure / Tools' | 'Other AI Applications';
+  stage: 'Pre-Seed' | 'Seed';
+  description: string;
+  geo: 'Based in the UAE' | 'Expanding into the UAE';
+  dataMigrationMethod: 'plugin' | 'manual';
+};
+
+// Investor onboarding
+type InvestorOnboarding = {
+  investorType: 'Individual Investor'|'Angel Investor'|'VC Partner'|'Family Office';
+  investmentTypes: Array<'Equity'|'Convertible Note / SAFE'|'Crowdfunding participation (via pooled round)'|'Strategic / Advisory'>;
+  ticketRange: '≤$50k'|'$50k–$250k'|'$250k–$1M'|'$1M+';
+  stages: Array<'Pre-Seed'|'Seed'>;
+  sectors: string[]; // normalized list; include free-text if "Other"
+  geoFocus: Array<'UAE'|'Expanding into the UAE'>;
+  roiPriorities: Array<'Financial'|'Operational'|'Innovation'|'Social/Sustainability'>;
+  visibility: 'visible'|'after_interest';
+  accredited?: boolean;
+};
+```
+
+---
+
+# Copy Blocks (for reuse)
+
+* **CTA:** In the meantime, you can explore the public campaigns.
+  **Button:** Explore campaigns → `/coming-soon`
+* **Manual CSV line:** “Click to download the template.csv” → **[hebed_ai_manual_metrics_template.csv](sandbox:/mnt/data/hebed_ai_manual_metrics_template.csv)**
+
+---
+
+# Accessibility & i18n
+
+* All interactive controls labeled (`aria-label`), group legends for checkbox/radio groups.
+* Keyboard focus visible; error summaries announced.
+* Text ready for translation; avoid hard-coded currency symbols in logic (display only).
+
+---
+
+# QA / Acceptance Criteria
+
+## `/onboarding/startup`
+
+* Required fields block submission; inline errors displayed.
+* Choosing **Plugin** shows plugin requirements list on success.
+* Choosing **Manual** shows CSV prompt with working download link and same metrics list.
+* Success view includes CTA to `/coming-soon`.
+
+## `/onboarding/investor`
+
+* Stepper shows 3 steps; cannot advance with missing required fields.
+* “Other emerging AI applications” reveals a required free-text input only when checked.
+* “UAE” is pre-checked in Geographic Focus.
+* Submit shows confirmation + CTA to `/coming-soon`.
+
+## `/dashboard/profile/page.tsx`
+
+* Startup KYC widget not rendered.
+* Investor Accreditation widget not rendered.
+
+## `/discover`
+
+* Funding goal field absent.
+* Hero text updated to “Explore verified AI matching opportunities”.
+* All widgets display `n/A` when value is 0 **except** “Active Campaign” (left-most), which may show **0**.
+
+## `investor-dashboard.tsx`
+
+* Social widgets render with counts; handle empty states gracefully.
+* Avatars not shown when 0 followers; comment preview opens full thread.
+
+---
+
+# Engineering Notes
+
+* **Routes:** guard with auth; save drafts on blur (optional).
+* **Enums:** strictly typed; map to display labels centrally.
+* **ARR:** for manual CSV, users may compute; in-app or during ingestion you may recompute `ARR = 12 * MRR_now`.
+* **Redirections:** use a central `ROUTES.comingSoon = '/coming-soon'` constant.
+* **Telemetry:** log onboarding completion `{ role: 'startup'|'investor', method: 'plugin'|'manual' }`.
+
+---
+
+If you want this as a ready-to-drop React/Next form (shadcn + Tailwind) or a Figma-ready copy deck, say the word and I’ll ship it.

@@ -1,0 +1,8 @@
+Product design
+
+cwd: ~\Downloads\MVP
+path1: ~\C:\Users\edwar\Downloads\MVP\PHASE_2-8_TEST_RESULTS.md
+credentials: C:\Users\edwar\Downloads\MVP\Demo_App_Development_Guide\ai_roi_dashboard\nextjs_space\.env
+cookie_value: "next-auth.csrf-token=d144484fb6dab10f3bc203a4395126929c4348d617e751bc297a1b5e929de549%7C5b4360828ab053149c6b62115107808224177e6556b8ddd106d7d165c38e80b9; next-auth.callback-url=http%3A%2F%2Flocalhost%3A3000%2Fauth%2Fsignin
+"
+
